@@ -17,7 +17,7 @@ end
 
 Thread.new do
   loop do
-    (player.say("Hello! :D"); player.look_at; 6.times {player.sneak; sleep 0.1}) if /hi|hey|hello/.match?(player_messages(1).join) && player.stopped
+    (player.say("Hello! :D"); player.look_at; 6.times {player.sneak; sleep 0.1}) if /hi|hey|hello/.match?(player_messages(1).join) && (player.stopped || player.idle)
   end
 end
 
