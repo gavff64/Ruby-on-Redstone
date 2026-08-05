@@ -2,6 +2,7 @@
 # Create a gemfile to bundle things like rcon
 
 require "rcon"
+require "json"
 require_relative "coords_parser"
 require_relative "chat_parser"
 
@@ -26,6 +27,10 @@ class Bot
     @stopped = true
   end
 
+  def scan
+    JSON.parse(@client.execute("fp scan", wait: "0.25").body)
+  end
+
   def say(message)
     @client.execute("fp cmd #{@name} say #{message}", wait: "0.25")
   end
@@ -46,23 +51,34 @@ class Bot
   def follow
     @stopped = false
     @idle = false
-    sprinting = false
-    toggle = false
+    sprint_toggle = false
+    swim_toggle = false
+
     loop do
       break if @stopped
       parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
       parsed_bot_coords = coords_parser(@client.execute("data get entity #{@name} Pos", wait: "0.25").body)
       distance_from_target = (parsed_bot_coords[:proper_array].sum - parsed_target_coords[:proper_array].sum).abs
       target_higher_than_bot = parsed_bot_coords[:proper_array][1] < parsed_target_coords[:proper_array][1]
+      should_swim = true if scan["block_at_feet"]["block"] == "minecraft:water" && scan["block_below"]["block"] == "minecraft:water"
+      should_swim = false if scan["block_at_feet"]["block"] != "minecraft:water" && scan["block_below"]["block"] != "minecraft:water"
       @idle = true if distance_from_target < 2
       @idle = false if distance_from_target >= 2
 
-      if distance_from_target >= 10 && toggle == false
+      if should_swim && swim_toggle == false
+        @client.execute("fp jump", wait: "0.25")
+        @client.execute("fp jump", wait: "0.25")
+        swim_toggle = true
+      elsif should_swim == false
+        swim_toggle = false
+      end
+
+      if distance_from_target >= 10 && sprint_toggle == false
         @client.execute("fp sprint", wait: "0.25")
-        toggle = true
-      elsif distance_from_target <= 9 && (toggle == true || @stopped == true)
+        sprint_toggle = true
+      elsif distance_from_target <= 9 && (sprint_toggle == true || @stopped == true)
         @client.execute("fp sprint", wait: "0.25")
-        toggle = false
+        sprint_toggle = false
       end
 
       @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
