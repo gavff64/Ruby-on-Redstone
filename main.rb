@@ -17,7 +17,33 @@ end
 
 Thread.new do
   loop do
-    (player.say("Hello! :D"); player.look_at; 6.times {player.sneak; sleep 0.1}) if /hi|hey|hello/.match?(player_messages(1).join) && (player.stopped || player.idle)
+    (player.say("Hello! :D"); player.look_at_player; 6.times {player.sneak; sleep 0.1}) if /hey|hello/.match?(player_messages(1).join) && (player.stopped || player.idle)
+  end
+end
+
+Thread.new do
+  loop do
+    (player.say("Mining!"); player.mine) if /mine/.match?(player_messages(1).join)
+  end
+end
+
+Thread.new do
+  loop do
+    (player.say("Attacking!"); player.attack) if /attack/.match?(player_messages(1).join)
+  end
+end
+
+Thread.new do
+  loop do
+    if /look at/.match?(player_messages(1).join)
+      match = player_messages(1).to_s.match(/look at\s+(\w+)/i)
+      thing = match[1]
+      if match && player.look_at(thing)
+        player.say("Looking at the #{thing}!")
+      else
+        player.say("I don't see the #{thing}")
+      end
+    end
   end
 end
 

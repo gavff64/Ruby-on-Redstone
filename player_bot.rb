@@ -27,11 +27,12 @@ class Bot
     @stopped = true
   end
 
-  def scan
+  def scan(parsed: true)
     @client.execute("fp scan", wait: "0.25")
     path = File.join(__dir__, "server", "plugins", "fakeplayer", "scans", "latest.json")
     file_content = File.read(path)
-    JSON.parse(file_content)
+    return JSON.parse(file_content) if parsed
+    return file_content if !parsed
   end
 
   def say(message)
@@ -82,9 +83,15 @@ class Bot
     @client.execute("fp sneak", wait: "0.25")
   end
 
-  def look_at
+  def look_at_player
     parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
     @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
+  end
+
+  def look_at(thing)
+    file_content = scan(parsed: false)
+    result_coords = JSON.parse(/\{"(?:block|type)":"minecraft:[a-z_]*#{Regexp.escape(thing)}[a-z_]*"[^}]*\}/i.match(file_content)[0])["pos"].join(" ") rescue nil
+    @client.execute("fp look at #{result_coords}", wait: "0.25") if result_coords
   end
 
   def follow
@@ -104,26 +111,26 @@ class Bot
       @idle = true if distance_from_target < 2
       @idle = false if distance_from_target >= 2
 
-      if should_swim && swim_toggle == false
+      if should_swim && !swim_toggle
         @client.execute("fp jump", wait: "0.25")
         @client.execute("fp jump", wait: "0.25")
         swim_toggle = true
-      elsif should_swim == false
+      elsif !should_swim
         swim_toggle = false
       end
 
-      if distance_from_target >= 10 && sprint_toggle == false
+      if distance_from_target >= 10 && !sprint_toggle
         @client.execute("fp sprint", wait: "0.25")
         sprint_toggle = true
-      elsif distance_from_target <= 9 && (sprint_toggle == true || @stopped == true)
+      elsif distance_from_target <= 9 && (sprint_toggle || @stopped)
         @client.execute("fp sprint", wait: "0.25")
         sprint_toggle = false
       end
 
       @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
-      @client.execute("fp move forward", wait: "0.25") if @idle == false
+      @client.execute("fp move forward", wait: "0.25") if !@idle
       @client.execute("fp jump", wait: "0.25") if target_higher_than_bot
-      @client.execute("fp stop", wait: "0.25") if @idle == true
+      @client.execute("fp stop", wait: "0.25") if @idle
       sleep 0.75
     end
     @idle = true
