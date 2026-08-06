@@ -27,8 +27,8 @@ class Bot
     @stopped = true
   end
 
-  def scan(parsed: true)
-    @client.execute("fp scan", wait: "0.25")
+  def scan(parsed: true, radius: 2)
+    @client.execute("fp scan #{radius}", wait: "0.25")
     path = File.join(__dir__, "server", "plugins", "fakeplayer", "scans", "latest.json")
     file_content = File.read(path)
     return JSON.parse(file_content) if parsed
@@ -89,7 +89,7 @@ class Bot
   end
 
   def look_at(thing)
-    file_content = scan(parsed: false)
+    file_content = scan(parsed: false, radius: 6)
     result_coords = JSON.parse(/\{"(?:block|type)":"minecraft:[a-z_]*#{Regexp.escape(thing)}[a-z_]*"[^}]*\}/i.match(file_content)[0])["pos"].join(" ") rescue nil
     @client.execute("fp look at #{result_coords}", wait: "0.25") if result_coords
   end
