@@ -30,8 +30,8 @@ import static net.kyori.adventure.text.Component.text;
  * 输出假人周围的信息 (JSON), 供外部程序 (例如 RCON 机器人) 解析
  * <p>包含以假人为中心的立方体内的所有方块 (含空气) 坐标, 以及最近的实体列表.
  * 每个方块/实体带有一个确定性生成的 {@code color} 字段 (由方块/实体 id 哈希得出).
- * 由于 RCON 响应有 4096 字符上限, 输出超过预算时会将完整 JSON 写入
- * {@code plugins/fakeplayer/scans/latest.json}, 响应中返回文件路径</p>
+ * 完整 JSON 始终写入 {@code plugins/fakeplayer/scans/latest.json} (RCON 响应有 4096
+ * 字符上限), 响应中返回摘要与文件路径</p>
  */
 @Singleton
 public class ScanCommand extends AbstractCommand {
@@ -50,11 +50,6 @@ public class ScanCommand extends AbstractCommand {
      * 最大立方体半径: 13x13x13 = 2197 个方块
      */
     public final static int MAX_RADIUS = 6;
-
-    /**
-     * RCON 响应预算 (服务端会在 4096 字符处截断)
-     */
-    private final static int RCON_RESPONSE_BUDGET = 3900;
 
     public void scan(@NotNull CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
         var fake = super.getFakeplayer(sender, args);
@@ -86,18 +81,13 @@ public class ScanCommand extends AbstractCommand {
         var feet = loc.getBlock();
         var below = feet.getRelative(BlockFace.DOWN);
 
+        // 完整 JSON 始终写入文件 (RCON 响应有 4096 字符上限, 且文件对机器人是稳定可靠的读取方式),
+        // 响应中返回摘要 + 文件路径
         var full = head(fake, loc, radius, lookingAt, feet, below, all, entities, grid.size())
                 .key("blocks").array(grid, this::blockJson)
                 .toString();
-        if (full.length() <= RCON_RESPONSE_BUDGET) {
-            sender.sendMessage(text(full));
-            return;
-        }
-
-        // 超过 RCON 响应上限: 完整 JSON 写入文件, 响应中返回路径
         var file = writeScanFile(full);
         var response = head(fake, loc, radius, lookingAt, feet, below, all, entities, grid.size())
-                .key("truncated").value(true)
                 .key("file").value(file.getAbsolutePath())
                 .toString();
         sender.sendMessage(text(response));

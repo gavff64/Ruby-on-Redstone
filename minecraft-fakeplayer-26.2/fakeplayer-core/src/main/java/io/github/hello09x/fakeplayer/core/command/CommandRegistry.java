@@ -85,6 +85,8 @@ public class CommandRegistry {
     private ScanCommand scanCommand;
     @Inject
     private BlockCommand blockCommand;
+    @Inject
+    private HighlightCommand highlightCommand;
 
     @Inject
     private FakeplayerConfig config;
@@ -193,6 +195,19 @@ public class CommandRegistry {
                                 .withArguments(location("location"))
                                 .withOptionalArguments(fakeplayer("name"))
                                 .executes(blockCommand::block),
+                        command("highlight")
+                                .withPermission(Permission.highlight)
+                                .withShortDescription("fakeplayer.command.highlight.description")
+                                .withRequirement(CommandSupports::hasFakeplayer)
+                                .withArguments(int32("radius", 1, ScanCommand.MAX_RADIUS))
+                                .withOptionalArguments(fakeplayer("name"))
+                                .executes(highlightCommand::highlightWithRadius),
+                        command("highlight")
+                                .withPermission(Permission.highlight)
+                                .withShortDescription("fakeplayer.command.highlight.description")
+                                .withRequirement(CommandSupports::hasFakeplayer)
+                                .withOptionalArguments(fakeplayer("name"))
+                                .executes(highlightCommand::highlight),
                         command("respawn")
                                 .withRequirement(CommandSupports::hasFakeplayerForRespawn)
                                 .withShortDescription("fakeplayer.command.respawn.description")

@@ -28,11 +28,50 @@ class Bot
   end
 
   def scan
-    JSON.parse(@client.execute("fp scan", wait: "0.25").body)
+    @client.execute("fp scan", wait: "0.25")
+    path = File.join(__dir__, "server", "plugins", "fakeplayer", "scans", "latest.json")
+    file_content = File.read(path)
+    JSON.parse(file_content)
   end
 
   def say(message)
-    @client.execute("fp cmd #{@name} say #{message}", wait: "0.25")
+    @client.execute("fp cmd #{@name} tellraw @a [\"\",{\"text\":\"<\",\"color\":\"white\"},{\"text\":\"#{@name}\",\"color\":\"#E05B5B\"},{\"text\":\"> \",\"color\":\"white\"},{\"text\":\"#{message}\",\"color\":\"white\"}]", wait: "0.25")
+  end
+
+  def use
+    @client.execute("fp use", wait: "0.25")
+  end
+
+  def mine
+    @client.execute("fp mine", wait: "0.25")
+  end
+
+  def attack
+    @client.execute("fp attack", wait: "0.25")
+  end
+
+  def command(string)
+    @client.execute("fp cmd #{@name} #{string}", wait: "0.25")
+  end
+
+  def drop
+    @client.execute("fp drop", wait: "0.25")
+  end
+
+  def drop_stack
+    @client.execute("fp dropstack", wait: "0.25")
+  end
+
+  def hold(slot)
+    @client.execute("fp hold #{slot}", wait: "0.25")
+  end
+
+  def sleep_in_bed
+    @client.execute("fp sleep", wait: "0.25")
+  end
+
+  def wakeup
+    @client.execute("fp wakeup", wait: "0.25")
   end
 
   def teleport

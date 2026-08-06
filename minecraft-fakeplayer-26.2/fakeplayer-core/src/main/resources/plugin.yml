@@ -92,6 +92,8 @@ permissions:
     description: 'Allow player to run /fp scan'
   fakeplayer.command.block:
     description: 'Allow player to run /fp block'
+  fakeplayer.command.highlight:
+    description: 'Allow player to run /fp highlight'
   fakeplayer.command.debug:
     description: 'Allow player to run /fp debug'
   fakeplayer.config.replenish:
@@ -138,6 +140,7 @@ permissions:
       - fakeplayer.command.info
       - fakeplayer.command.scan
       - fakeplayer.command.block
+      - fakeplayer.command.highlight
 
   fakeplayer.action:
     description: 'Includes all permissions about controlling action'

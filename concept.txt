@@ -1,0 +1,2 @@
+LLM could have it's own IRB of sorts. Ruby on Redstone would be the API for interacting with the game. LLM would write code depending on certain actions.
+"tower up", and the LLM can see it has player.jump, player.use, it's inventory, etc. and writes a plan accordingly.
