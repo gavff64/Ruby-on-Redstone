@@ -48,7 +48,7 @@ public interface Permission {
     String info = "fakeplayer.command.info";
     String scan = "fakeplayer.command.scan";
     String block = "fakeplayer.command.block";
-    String debug = "fakeplayer.command.highlight";
+    String debug = "fakeplayer.command.debug";
 
 
     String op = "OP";

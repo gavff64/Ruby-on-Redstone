@@ -85,8 +85,6 @@ public class CommandRegistry {
     private ScanCommand scanCommand;
     @Inject
     private BlockCommand blockCommand;
-    @Inject
-    private HighlightCommand highlightCommand;
 
     @Inject
     private FakeplayerConfig config;
@@ -180,13 +178,13 @@ public class CommandRegistry {
                                 .withPermission(Permission.scan)
                                 .withShortDescription("fakeplayer.command.scan.description")
                                 .withRequirement(CommandSupports::hasFakeplayer)
-                                .withOptionalArguments(fakeplayer("name"))
+                                .withOptionalArguments(int32("radius", 1, ScanCommand.MAX_RADIUS), int32("limit", 1, 50), fakeplayer("name"))
                                 .executes(scanCommand::scan),
                         command("scan")
                                 .withPermission(Permission.scan)
                                 .withShortDescription("fakeplayer.command.scan.description")
                                 .withRequirement(CommandSupports::hasFakeplayer)
-                                .withOptionalArguments(int32("radius", 1, 64), int32("limit", 1, 50), fakeplayer("name"))
+                                .withOptionalArguments(fakeplayer("name"))
                                 .executes(scanCommand::scan),
                         command("block")
                                 .withPermission(Permission.block)
@@ -195,12 +193,6 @@ public class CommandRegistry {
                                 .withArguments(location("location"))
                                 .withOptionalArguments(fakeplayer("name"))
                                 .executes(blockCommand::block),
-                        command("highlight")
-                                .withPermission(Permission.debug)
-                                .withShortDescription("fakeplayer.command.highlight.description")
-                                .withRequirement(CommandSupports::hasFakeplayer)
-                                .withOptionalArguments(fakeplayer("name"))
-                                .executes(highlightCommand::highlight),
                         command("respawn")
                                 .withRequirement(CommandSupports::hasFakeplayerForRespawn)
                                 .withShortDescription("fakeplayer.command.respawn.description")
@@ -513,7 +505,7 @@ public class CommandRegistry {
                                 .executes(reloadCommand::reloadTranslation),
 
                         // developer debug
-                        command("highlight")
+                        command("debug")
                                 .withPermission(CommandPermission.OP)
                                 .withRequirement(sender -> config.isDebug())
                                 .withSubcommands(

@@ -18,9 +18,11 @@ public class InfoCommand extends AbstractCommand {
     public void info(@NotNull CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
         var fake = super.getFakeplayer(sender, args);
         var loc = fake.getLocation();
+        var velocity = fake.getVelocity();
         var json = JsonBuilder.obj()
                 .key("name").value(fake.getName())
                 .key("pos").pos(loc.getX(), loc.getY(), loc.getZ())
+                .key("velocity").pos(velocity.getX(), velocity.getY(), velocity.getZ())
                 .key("dimension").value(loc.getWorld().getKey().toString())
                 .key("yaw").value(Math.round(loc.getYaw() * 100) / 100.0)
                 .key("pitch").value(Math.round(loc.getPitch() * 100) / 100.0)
