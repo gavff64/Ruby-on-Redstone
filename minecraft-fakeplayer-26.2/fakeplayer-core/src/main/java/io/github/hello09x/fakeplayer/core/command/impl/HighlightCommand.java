@@ -74,6 +74,11 @@ public class HighlightCommand extends AbstractCommand {
     public void highlightWithRadius(@NotNull CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
         var fake = super.getFakeplayer(sender, args);
         var radius = (Integer) args.get("radius");
+        if (radius < 1 || radius > ScanCommand.MAX_RADIUS) {
+            throw dev.jorel.commandapi.CommandAPI.failWithString(
+                    "Radius must be between 1 and " + ScanCommand.MAX_RADIUS + " (got " + radius + ")"
+            );
+        }
         this.toggle(fake, radius, sender);
     }
 

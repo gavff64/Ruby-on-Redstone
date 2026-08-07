@@ -51,6 +51,10 @@ class Bot
     @client.execute("fp attack", wait: "0.25")
   end
 
+  def walk
+    @client.execute("fp move forward", wait: "0.25")
+  end
+
   def command(string)
     @client.execute("fp cmd #{@name} #{string}", wait: "0.25")
   end
@@ -89,12 +93,13 @@ class Bot
   end
 
   def look_at(thing)
-    file_content = scan(parsed: false, radius: 6)
+    file_content = scan(parsed: false, radius: 10)
     result_coords = JSON.parse(/\{"(?:block|type)":"minecraft:[a-z_]*#{Regexp.escape(thing)}[a-z_]*"[^}]*\}/i.match(file_content)[0])["pos"].join(" ") rescue nil
     @client.execute("fp look at #{result_coords}", wait: "0.25") if result_coords
+    return result_coords
   end
 
-  def follow
+  def go_to(thing)
     @stopped = false
     @idle = false
     sprint_toggle = false
@@ -102,10 +107,16 @@ class Bot
 
     loop do
       break if @stopped
-      parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
+      # parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
+      # parsed_bot_coords = coords_parser(@client.execute("data get entity #{@name} Pos", wait: "0.25").body)
+      # distance_from_target = (parsed_bot_coords[:proper_array].sum - parsed_target_coords[:proper_array].sum).abs
+      # target_higher_than_bot = parsed_bot_coords[:proper_array][1] < parsed_target_coords[:proper_array][1]
+
+      target_coords = thing.split.map(&:to_f)
       parsed_bot_coords = coords_parser(@client.execute("data get entity #{@name} Pos", wait: "0.25").body)
-      distance_from_target = (parsed_bot_coords[:proper_array].sum - parsed_target_coords[:proper_array].sum).abs
-      target_higher_than_bot = parsed_bot_coords[:proper_array][1] < parsed_target_coords[:proper_array][1]
+      distance_from_target = (parsed_bot_coords[:proper_array].sum - target_coords.sum).abs
+      target_higher_than_bot = parsed_bot_coords[:proper_array][1] < target_coords[1]
+
       should_swim = true if scan["block_at_feet"]["block"] == "minecraft:water" && scan["block_below"]["block"] == "minecraft:water"
       should_swim = false if scan["block_at_feet"]["block"] != "minecraft:water" && scan["block_below"]["block"] != "minecraft:water"
       @idle = true if distance_from_target < 2
@@ -127,7 +138,7 @@ class Bot
         sprint_toggle = false
       end
 
-      @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
+      @client.execute("fp look at #{target_coords}", wait: "0.25")
       @client.execute("fp move forward", wait: "0.25") if !@idle
       @client.execute("fp jump", wait: "0.25") if target_higher_than_bot
       @client.execute("fp stop", wait: "0.25") if @idle

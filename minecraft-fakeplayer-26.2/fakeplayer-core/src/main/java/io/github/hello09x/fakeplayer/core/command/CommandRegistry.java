@@ -180,7 +180,7 @@ public class CommandRegistry {
                                 .withPermission(Permission.scan)
                                 .withShortDescription("fakeplayer.command.scan.description")
                                 .withRequirement(CommandSupports::hasFakeplayer)
-                                .withOptionalArguments(int32("radius", 1, ScanCommand.MAX_RADIUS), int32("limit", 1, 50), fakeplayer("name"))
+                                .withOptionalArguments(int32("radius", 0, 64), int32("limit", 1, 50), fakeplayer("name"))
                                 .executes(scanCommand::scan),
                         command("scan")
                                 .withPermission(Permission.scan)
@@ -199,7 +199,7 @@ public class CommandRegistry {
                                 .withPermission(Permission.highlight)
                                 .withShortDescription("fakeplayer.command.highlight.description")
                                 .withRequirement(CommandSupports::hasFakeplayer)
-                                .withArguments(int32("radius", 1, ScanCommand.MAX_RADIUS))
+                                .withArguments(int32("radius", 0, 64))
                                 .withOptionalArguments(fakeplayer("name"))
                                 .executes(highlightCommand::highlightWithRadius),
                         command("highlight")

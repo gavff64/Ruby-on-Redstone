@@ -1,69 +1,53 @@
 require_relative "player_bot"
-require_relative "chat_parser" # Consider moving this to player_bot
+require 'ripper'
 
-player = nil
 # (player_name, player_skin_name)
+player = Bot.new("Ruby", "Vkkz")
+
+DISALLOWED = %w[
+  File Dir IO Socket TCPSocket UDPSocket UNIXSocket Net Process
+  ObjectSpace Marshal Kernel GC Fiber
+  eval instance_eval class_eval module_eval binding
+  send __send__ public_send method instance_variable_get instance_variable_set
+  const_get const_set define_method remove_method undef_method
+  system exec spawn fork open require require_relative load autoload
+  at_exit caller trap alias_method
+].freeze
+
+def disallowed?(code)
+  Ripper.lex(code).any? do |position, type, text, state|
+    (type == :on_ident || type == :on_const) && DISALLOWED.include?(text)
+  end
+
+rescue StandardError
+  true
+end
+
+buffer = ""
+puts "Ruby on Redstone REPL."
+puts "Type 'exit' to quit."
+
 loop do
-  break if player
-  player = Bot.new("Ruby", "Vkkz") if /spawn/.match?(player_messages(1).join) && player.nil?
-  sleep 0.5
-end
+  print buffer.empty? ? "> " : "* "
+  line = gets
+  break if line.nil?
+  break if buffer.empty? && line.chomp == "exit"
+  buffer += line
 
-Thread.new do
-  loop do
-    (player.say("Teleporting!"); player.teleport) if /teleport|tp/.match?(player_messages(1).join)
-  end
-end
+  tree = Ripper.sexp(buffer)
+  next if tree.nil?
 
-Thread.new do
-  loop do
-    (player.say("Hello! :D"); player.look_at_player; 6.times {player.sneak; sleep 0.1}) if /hey|hello/.match?(player_messages(1).join) && (player.stopped || player.idle)
-  end
-end
-
-Thread.new do
-  loop do
-    (player.say("Mining!"); player.mine) if /mine/.match?(player_messages(1).join)
-  end
-end
-
-Thread.new do
-  loop do
-    (player.say("Attacking!"); player.attack) if /attack/.match?(player_messages(1).join)
-  end
-end
-
-Thread.new do
-  loop do
-    if /look at/.match?(player_messages(1).join)
-      match = player_messages(1).to_s.match(/look at\s+(\w+)/i)
-      thing = match[1]
-      if match && player.look_at(thing)
-        player.say("Looking at the #{thing}!")
-      else
-        player.say("I don't see the #{thing}")
-      end
+  if disallowed?(buffer)
+    puts "Blocked: '(text)' not allowed. Please stick to things like loops, basic data types, etc." # Fix this, get the text to display.
+  else
+    begin
+      p eval(buffer, binding)
+    rescue StandardError => e
+      puts "Error: #{e.class}: #{e.message}"
     end
   end
+  buffer = ""
 end
 
-Thread.new do
-  loop do
-    (player.say("Stopping!"); player.stop) if /stop/.match?(player_messages(1).join) && !player.stopped
-    (player.say("I'm already stopped!")) if /stop/.match?(player_messages(1).join) && player.stopped
-  end
-end
-
-Thread.new do
-  loop do
-    (player.say("Following!"); player.follow) if /follow/.match?(player_messages(1).join) && player.stopped
-  end
-end
-
-Thread.new do
-  loop do
-    (player.say("I'm already following!")) if /follow/.match?(player_messages(1).join) && !player.stopped
-  end
-end.join
 
 # player.follow; player.stop; player.say(message)

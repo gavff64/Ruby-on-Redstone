@@ -5,6 +5,7 @@ import io.github.hello09x.fakeplayer.core.constant.ConstantPool;
 import io.github.hello09x.fakeplayer.core.util.Reflections;
 import io.github.hello09x.fakeplayer.v26_2.network.FakePlayerAdvancements;
 import lombok.Getter;
+import lombok.Lombok;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -37,6 +38,18 @@ public class NMSServerPlayerImpl implements NMSServerPlayer {
             PlayerAdvancements.class,
             false
     );
+
+    private final static Field ServerPlayer$isChangingDimension = getChangingDimensionField();
+
+    private static @NotNull Field getChangingDimensionField() {
+        try {
+            var field = ServerPlayer.class.getDeclaredField("isChangingDimension");
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException e) {
+            throw Lombok.sneakyThrow(e);
+        }
+    }
 
     @Getter
     private final ServerPlayer handle;
@@ -82,6 +95,15 @@ public class NMSServerPlayerImpl implements NMSServerPlayer {
     @Override
     public void doTick() {
         handle.doTick();
+        // 26.2: 假人的跨维度传送没有客户端确认, isChangingDimension 会一直为 true,
+        // 导致 ServerPlayer#isInvulnerableTo 对所有伤害返回 true (与 1.21.10 起的上游问题一致),
+        // 这里每 tick 清除该标记, 让假人可以正常受伤
+        try {
+            if (ServerPlayer$isChangingDimension.getBoolean(handle)) {
+                ServerPlayer$isChangingDimension.setBoolean(handle, false);
+            }
+        } catch (IllegalAccessException ignored) {
+        }
     }
 
     @Override

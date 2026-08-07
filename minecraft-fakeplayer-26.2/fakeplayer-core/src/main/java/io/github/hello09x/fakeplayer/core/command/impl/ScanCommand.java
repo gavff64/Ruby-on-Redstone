@@ -47,13 +47,18 @@ public class ScanCommand extends AbstractCommand {
     private final static int DEFAULT_RADIUS = 2;
 
     /**
-     * 最大立方体半径: 13x13x13 = 2197 个方块
+     * 最大立方体半径: 21x21x21 = 9261 个方块
      */
-    public final static int MAX_RADIUS = 6;
+    public final static int MAX_RADIUS = 10;
 
     public void scan(@NotNull CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
         var fake = super.getFakeplayer(sender, args);
         int radius = (int) args.getOptional("radius").orElse(DEFAULT_RADIUS);
+        if (radius < 1 || radius > MAX_RADIUS) {
+            throw dev.jorel.commandapi.CommandAPI.failWithString(
+                    "Radius must be between 1 and " + MAX_RADIUS + " (got " + radius + ")"
+            );
+        }
         int limit = (int) args.getOptional("limit").orElse(10);
 
         var loc = fake.getLocation();

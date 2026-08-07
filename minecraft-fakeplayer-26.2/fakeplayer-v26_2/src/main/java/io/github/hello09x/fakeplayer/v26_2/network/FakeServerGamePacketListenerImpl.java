@@ -60,6 +60,13 @@ public class FakeServerGamePacketListenerImpl extends ServerGamePacketListenerIm
     }
 
     @Override
+    public boolean hasClientLoaded() {
+        // 假人没有客户端, 永远视为客户端已加载完成;
+        // 否则 ServerPlayer#isInvulnerableTo 会因 hasClientLoaded() == false 对所有伤害返回 true
+        return true;
+    }
+
+    @Override
     public void disconnect(@NotNull DisconnectionDetails details) {
         super.disconnect(details);
         // 26.2 的踢出流程改为: disconnect0 发送 DisconnectPacket, 发送完成回调里才调用
