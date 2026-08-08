@@ -14,16 +14,20 @@ DISALLOWED = %w[
   at_exit caller trap alias_method
 ].freeze
 
-def disallowed?(code)
-  Ripper.lex(code).any? do |position, type, text, state|
+def disallowed_token(code)
+  match = Ripper.lex(code).find do |position, type, text, state|
     (type == :on_ident || type == :on_const) && DISALLOWED.include?(text)
   end
+  match && match[2]
 
 rescue StandardError
-  true
+  :parse_error
 end
 
+repl_binding = binding
 buffer = ""
+multiline = false
+
 puts "Ruby on Redstone REPL."
 puts "Type 'exit' to quit."
 
@@ -32,21 +36,29 @@ loop do
   line = gets
   break if line.nil?
   break if buffer.empty? && line.chomp == "exit"
+
   buffer += line
+  multiline = true if buffer.count("\n") > 1 unless multiline
 
   tree = Ripper.sexp(buffer)
   next if tree.nil?
+  next if multiline && line.chomp != ""
 
-  if disallowed?(buffer)
-    puts "Blocked: '(text)' not allowed. Please stick to things like loops, basic data types, etc." # Fix this, get the text to display.
+  dangerous = disallowed_token(buffer)
+
+  if dangerous
+    msg = dangerous == :parse_error ? "could not be parsed" : "'#{dangerous}' not allowed"
+    puts "Blocked: #{msg}. Please stick to things like loops, basic data types, etc."
   else
     begin
-      p eval(buffer, binding)
+      p eval(buffer, repl_binding)
     rescue StandardError => e
       puts "Error: #{e.class}: #{e.message}"
     end
   end
+
   buffer = ""
+  multiline = false
 end
 
 
