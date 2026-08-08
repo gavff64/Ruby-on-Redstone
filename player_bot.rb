@@ -16,7 +16,7 @@ class Bot
     @name = name
     @host_ign = last_player_name.freeze
     @stopped = true
-    @idle = true
+    @currently_sneaking = false
     client.authenticate!(ignore_first_packet: false)
     client.execute("fp spawn #{name}", wait: "0.25")
     client.execute("fp skin #{skin_name}", wait: "0.25")
@@ -25,6 +25,7 @@ class Bot
 
   def stop
     @stopped = true
+    return "Stopped."
   end
 
   def scan(parsed: true, radius: 2)
@@ -37,90 +38,104 @@ class Bot
 
   def say(message)
     @client.execute("fp cmd #{@name} tellraw @a [\"\",{\"text\":\"<\",\"color\":\"white\"},{\"text\":\"#{@name}\",\"color\":\"#E05B5B\"},{\"text\":\"> \",\"color\":\"white\"},{\"text\":\"#{message}\",\"color\":\"white\"}]", wait: "0.25")
+    return "Message sent."
   end
 
   def use
     @client.execute("fp use", wait: "0.25")
+    return "Used item."
+  end
+
+  def jump
+    @client.execute("fp jump", wait: "0.25")
+    return "Jumped."
   end
 
   def mine
     @client.execute("fp mine", wait: "0.25")
+    return "Mining."
   end
 
   def attack
     @client.execute("fp attack", wait: "0.25")
+    return "Attacking once."
   end
 
   def walk
     @client.execute("fp move forward", wait: "0.25")
+    return "Walking forward about 3 blocks."
+  end
+
+  def look(direction)
+    @client.execute("fp look #{direction}", wait: "0.25")
+    return "Looking #{direction}."
   end
 
   def command(string)
     @client.execute("fp cmd #{@name} #{string}", wait: "0.25")
+    return "Command #{string} sent."
   end
 
   def drop
     @client.execute("fp drop", wait: "0.25")
+    return "Dropped item or block from hand."
   end
 
   def drop_stack
     @client.execute("fp dropstack", wait: "0.25")
+    return "Dropped entire stack of item or block from hand."
   end
 
   def hold(slot)
     @client.execute("fp hold #{slot}", wait: "0.25")
-  end
-
-  def sleep_in_bed
-    @client.execute("fp sleep", wait: "0.25")
-  end
-
-  def wakeup
-    @client.execute("fp wakeup", wait: "0.25")
+    return "Now holding slot number #{slot}."
   end
 
   def teleport
+    return "Unable to specify who to teleport to. Not initialized, please ignore." if @host_ign == ""
+
     @client.execute("fp cmd #{@name} tp #{@name} #{@host_ign}", wait: "0.25")
+    return "Teleported to #{@host_ign}."
   end
 
   def sneak
-    @client.execute("fp sneak", wait: "0.25")
+    (@client.execute("fp sneak", wait: "0.25"); @currently_sneaking = true) if !@currently_sneaking
+    (@client.execute("fp sneak", wait: "0.25"); @currently_sneaking = false) if @currently_sneaking
+    return "Now currently sneaking. Sneak toggle ON." if @currently_sneaking
+    return "No longer sneaking. Sneak toggle OFF." if !@currently_sneaking
   end
 
   def look_at_player
+    return "Unable to specify who to look at. Not initialized, please ignore." if @host_ign == ""
+
     parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
     @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
+    return "Looking at player '#{@host_ign}'."
   end
 
   def look_at(thing)
     file_content = scan(parsed: false, radius: 10)
     result_coords = JSON.parse(/\{"(?:block|type)":"minecraft:[a-z_]*#{Regexp.escape(thing)}[a-z_]*"[^}]*\}/i.match(file_content)[0])["pos"].join(" ") rescue nil
     @client.execute("fp look at #{result_coords}", wait: "0.25") if result_coords
+    puts "Looking at first '#{thing}' found at #{result_coords}."
     return result_coords
   end
 
   def go_to(thing)
     @stopped = false
-    @idle = false
     sprint_toggle = false
     swim_toggle = false
+    target_coords = look_at(thing).split.map(&:to_f)
 
     loop do
-      break if @stopped
-      # parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
-      # parsed_bot_coords = coords_parser(@client.execute("data get entity #{@name} Pos", wait: "0.25").body)
-      # distance_from_target = (parsed_bot_coords[:proper_array].sum - parsed_target_coords[:proper_array].sum).abs
-      # target_higher_than_bot = parsed_bot_coords[:proper_array][1] < parsed_target_coords[:proper_array][1]
+      return "Arrived to target '#{thing}' at coordinates #{target_coords}." if @stopped
 
-      target_coords = thing.split.map(&:to_f)
       parsed_bot_coords = coords_parser(@client.execute("data get entity #{@name} Pos", wait: "0.25").body)
       distance_from_target = (parsed_bot_coords[:proper_array].sum - target_coords.sum).abs
       target_higher_than_bot = parsed_bot_coords[:proper_array][1] < target_coords[1]
 
       should_swim = true if scan["block_at_feet"]["block"] == "minecraft:water" && scan["block_below"]["block"] == "minecraft:water"
       should_swim = false if scan["block_at_feet"]["block"] != "minecraft:water" && scan["block_below"]["block"] != "minecraft:water"
-      @idle = true if distance_from_target < 2
-      @idle = false if distance_from_target >= 2
 
       if should_swim && !swim_toggle
         @client.execute("fp jump", wait: "0.25")
@@ -139,12 +154,12 @@ class Bot
       end
 
       @client.execute("fp look at #{target_coords}", wait: "0.25")
-      @client.execute("fp move forward", wait: "0.25") if !@idle
+      @client.execute("fp move forward", wait: "0.25")
       @client.execute("fp jump", wait: "0.25") if target_higher_than_bot
-      @client.execute("fp stop", wait: "0.25") if @idle
+      @stopped = true if distance_from_target < 2
       sleep 0.75
     end
-    @idle = true
+    @stopped = true
   end
 end
 

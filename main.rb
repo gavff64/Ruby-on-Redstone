@@ -6,7 +6,7 @@ player = Bot.new("Ruby", "Vkkz")
 
 DISALLOWED = %w[
   File Dir IO Socket TCPSocket UDPSocket UNIXSocket Net Process
-  ObjectSpace Marshal Kernel GC Fiber
+  ObjectSpace Marshal Kernel GC Fiber Ractor
   eval instance_eval class_eval module_eval binding
   send __send__ public_send method instance_variable_get instance_variable_set
   const_get const_set define_method remove_method undef_method
