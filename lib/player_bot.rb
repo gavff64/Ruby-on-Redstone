@@ -14,7 +14,6 @@ class Bot
     client = Rcon::Client.new(host: "0.0.0.0", port: 25575, password: "1234")
     @client = client
     @name = name
-    @host_ign = last_player_name.freeze
     @stopped = true
     @currently_sneaking = false
     client.authenticate!(ignore_first_packet: false)
@@ -91,26 +90,16 @@ class Bot
     return "Now holding slot number #{slot}."
   end
 
-  def teleport
-    return "Unable to specify who to teleport to. Not initialized, please ignore." if @host_ign == ""
-
-    @client.execute("fp cmd #{@name} tp #{@name} #{@host_ign}", wait: "0.25")
-    return "Teleported to #{@host_ign}."
-  end
-
   def sneak
-    (@client.execute("fp sneak", wait: "0.25"); @currently_sneaking = true) if !@currently_sneaking
-    (@client.execute("fp sneak", wait: "0.25"); @currently_sneaking = false) if @currently_sneaking
-    return "Now currently sneaking. Sneak toggle ON." if @currently_sneaking
-    return "No longer sneaking. Sneak toggle OFF." if !@currently_sneaking
-  end
+    @client.execute("fp sneak", wait: "0.25")
 
-  def look_at_player
-    return "Unable to specify who to look at. Not initialized, please ignore." if @host_ign == ""
-
-    parsed_target_coords = coords_parser(@client.execute("data get entity #{@host_ign} Pos", wait: "0.25").body)
-    @client.execute("fp look at #{parsed_target_coords[:minecraft_string_eye_level]}", wait: "0.25")
-    return "Looking at player '#{@host_ign}'."
+    if !@currently_sneaking
+      @currently_sneaking = true
+      return "Now currently sneaking. Sneak toggle ON."
+    else
+      @currently_sneaking = false
+      return "No longer sneaking. Sneak toggle OFF."
+    end
   end
 
   def look_at(thing)

@@ -1,5 +1,5 @@
-require_relative "player_bot"
-require 'ripper'
+require_relative "lib/player_bot"
+require "ripper"
 
 # (player_name, player_skin_name)
 player = Bot.new("Ruby", "Vkkz")

@@ -9,10 +9,3 @@ def player_messages(up_to)
   end
 end
 
-def last_player_name
-  path = File.join(__dir__, "server", "logs", "latest.log")
-  latest_system_logs = File.read(path).lines[-1] # not a great way to do this
-  latest_system_logs.scan(/<([^>]*)>/).join
-end
-
-

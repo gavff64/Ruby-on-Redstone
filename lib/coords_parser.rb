@@ -1,5 +1,3 @@
-# hopefully more readable now
-
 def coords_parser(str)
   coords = {}
 
