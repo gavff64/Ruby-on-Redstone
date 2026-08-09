@@ -1,8 +1,6 @@
-# Maybe consider putting the following logic in a separate file as that'll be complicated, not sure.
-# Create a gemfile to bundle things like rcon
-
 require "rcon"
 require "json"
+require "pathname"
 require_relative "coords_parser"
 require_relative "chat_parser"
 
@@ -29,7 +27,7 @@ class Bot
 
   def scan(parsed: true, radius: 2)
     @client.execute("fp scan #{radius}", wait: "0.25")
-    path = File.join(__dir__, "server", "plugins", "fakeplayer", "scans", "latest.json")
+    path = Pathname.new(__dir__).join("..", "server", "plugins", "fakeplayer", "scans", "latest.json").expand_path
     file_content = File.read(path)
     return JSON.parse(file_content) if parsed
     return file_content if !parsed
@@ -106,8 +104,14 @@ class Bot
     file_content = scan(parsed: false, radius: 10)
     result_coords = JSON.parse(/\{"(?:block|type)":"minecraft:[a-z_]*#{Regexp.escape(thing)}[a-z_]*"[^}]*\}/i.match(file_content)[0])["pos"].join(" ") rescue nil
     @client.execute("fp look at #{result_coords}", wait: "0.25") if result_coords
-    puts "Looking at first '#{thing}' found at #{result_coords}."
+    puts "Looking at first '#{thing}'. If found, the coordinates will show here -> #{result_coords}."
     return result_coords
+  end
+
+  def look_at_coords(coords)
+    return "Incorrect format. Minecraft only takes 'num num num'. No brackets or commas." if !coords.match(/^-?\d+ -?\d+ -?\d+$/)
+    @client.execute("fp look at #{coords}", wait: "0.25")
+    return "Looking at '#{coords}'."
   end
 
   def go_to(thing)
