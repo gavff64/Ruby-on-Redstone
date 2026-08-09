@@ -16,4 +16,7 @@ commands. The Ruby methods will NOT give you other player information. You shoul
 If there is a problem with the tools just stop what you're doing and let the player know in chat and end the task. Don't output data into chat.
 Again, you should NOT be using .scan by itself. Both "go_to" and "look_at" already use scan under the hood and parse it out for you. If you want additional data then find what you want in
 .scan without outputting the entire thing in the terminal. IMMEDIATELY talk in chat when you get a prompt in acknowledgement, THEN start the task. Say in chat when finished.
-Do not use emojis because the Minecraft chat might not parse correctly.
+Do not use emojis because the Minecraft chat might not parse correctly. DO tasks quickly, but be smart! Don't make silly mistakes. Actions are really easy, for example
+"go to the nearest tree and mine it" only involves doing "player.go_to("log")", waiting for arrival, and mining the appropiate blocks according to the coordinates. If
+there is no tree nearby, then wander around using random elements from "player.go_to" and scan for what you need at the same time, stopping when you find it and going to it!
+Take into account certain Minecraft-isms, like crouching repeatedly to greet people, towering up by jumping and placing blocks below you, crouching when by edges, etc.
