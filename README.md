@@ -1,14 +1,17 @@
 # Ruby on Redstone ⛏️
 
-**Introduction and an important note:**
+I discovered [this fake player plugin](https://github.com/tanyaofei/minecraft-fakeplayer) and thought it would be cool if I could use rcon-rb to interface with it through Ruby. And yes, you can!
 
-> I discovered [this fake player plugin](https://github.com/tanyaofei/minecraft-fakeplayer) and thought it would be cool if I could use rcon-rb to interface with it through Ruby. And yes, you can!
-> 
-> The concept of this project is that we make a semi-sandboxed REPL environment, give an LLM a bit of context, and then instruct the LLM to do whatever you want. Since the bot player has OP, full in-game chat access, and a nearly full Ruby environment, there's a lot of possibilities. That being said...
-> 
-> ⚠️ **This is NOT a truly sandboxed REPL environment. If the LLM wanted, it could easily escape and cause unintended behavior. Use at your own risk. Again, this is merely a small hobbiest project/proof of concept.**
+The concept of this project is that we make a semi-sandboxed REPL environment, give an LLM a bit of context, and then instruct the LLM to do whatever you want. Since the bot player has OP, full in-game chat access, and a nearly full Ruby environment, there's a lot of possibilities. That being said...
 
-## Deepseek v4 Flash Low Examples (sped up and cut:
+> <div align="center">
+> ⚠️ WARNING:
+>
+> **This is NOT a truly sandboxed REPL environment. If the LLM wanted, it could easily escape and cause unintended behavior. Use at your own risk. Again, this is merely a small hobbiest project/proof of concept.** </div>
+
+
+
+## DeepSeek v4 Flash Low Examples (sped up and cut):
 | Video | Description |
 |-------|-------------|
 | <video src="https://github.com/user-attachments/assets/e2b33327-e195-4389-ac0e-09e2d4e2f7d4" width="320" height="240" controls></video> | **Example 1** — Putting a nametag on a pig and then accepting further instructions to attack it |
