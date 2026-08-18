@@ -21,8 +21,6 @@ The concept of this project is that we make a semi-sandboxed REPL environment, g
 | <video src="https://github.com/user-attachments/assets/66b72706-0102-4dae-b234-f475f764ab02" width="320" height="240" controls></video> | **Example 4** — Teleporting to me and barely suceeding in destroying a sign. |
 | <video src="https://github.com/user-attachments/assets/b46d8bef-f417-4917-ba6c-38cc80647cc7" width="320" height="240" controls></video> | **Debug Mode (REPL)** — Manually write Ruby scripts with the same tooling as the bot has. Here's a bad example that I can't be bothered to record again. |
 
-> [!NOTE]
-> The FakePlayer plugin has been slightly modified to support 26.2 as well as add some niceties like grabbing every block and entity coordinate within a radius. I don't know Java, so... thank you China ;)
 
 ## Current Limitations
 
@@ -39,6 +37,9 @@ This project is built on top of the following open-source work:
 - [**rcon-rb**](https://codeberg.org/hernanat/rconrb) — Ruby RCON client used to communicate with the Minecraft server.
 - [**ruby_llm**](https://github.com/crmne/ruby_llm) — Ruby framework used for LLM integration. Licensed under MIT.
 - [**minecraft-fakeplayer**](https://github.com/tanyaofei/minecraft-fakeplayer) — Server-side plugin used to spawn and control the bot player.
+
+> [!NOTE]
+> The FakePlayer plugin has been slightly modified to support 26.2 as well as add some niceties like grabbing every block and entity coordinate within a radius. I don't know Java, so... thank you China ;) iykyk
 
 ---
 
