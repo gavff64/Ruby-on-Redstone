@@ -6,7 +6,8 @@ My first swing at something like this. I discovered [this fake player plugin](ht
 
 Here, we make a semi-sandboxed REPL environment, give an LLM a bit of context, and then instruct the LLM to do whatever you want. Since the bot player has OP, full in-game chat access, and a nearly full Ruby environment, there's a lot of possibilities. **HOWEVER!** That being said...
 
-> ⚠️ This is not a truly sandboxed REPL environment. If the LLM wanted, it could easily escape. It's about as dangerous as running an LLM in YOLO mode on your harness overnight. Which some may argue is not that dangerous at all. Use at your own caution. Again, this is merely a small hobbiest project/proof of concept.
+> [!WARNING]
+> This is not a truly sandboxed REPL environment. If the LLM wanted, it could easily escape. It's about as dangerous as running an LLM in YOLO mode on your harness overnight. Which some may argue is not that dangerous at all. Use at your own caution. Again, this is merely a small hobbiest project/proof of concept.
 
 Here's some examples with DeepSeek v4 Flash on low thinking effort (sped up and cut):
 
