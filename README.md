@@ -2,14 +2,15 @@
 
 **A highly experimental *rough* proof of concept Ruby-based Minecraft bot controlled through RCON** 
 
-My first swing at something like this. I discovered [this fake player plugin](https://github.com/tanyaofei/minecraft-fakeplayer) and thought it would be cool if I could use rcon-rb to interface with it through Ruby. And yes, you can!
+> My first swing at something like this. I discovered [this fake player plugin](https://github.com/tanyaofei/minecraft-fakeplayer) and thought it would be cool if I could use rcon-rb to interface with it through Ruby. And yes, you can!
 
+## Concept
 Here, we make a semi-sandboxed REPL environment, give an LLM a bit of context, and then instruct the LLM to do whatever you want. Since the bot player has OP, full in-game chat access, and a nearly full Ruby environment, there's a lot of possibilities. **HOWEVER!** That being said...
 
-> [!WARNING]
-> This is not a truly sandboxed REPL environment. If the LLM wanted, it could easily escape. It's about as dangerous as running an LLM in YOLO mode on your harness overnight. Which some may argue is not that dangerous at all. Use at your own caution. Again, this is merely a small hobbiest project/proof of concept.
+> [!CAUTION]
+> This is not a truly sandboxed REPL environment. If the LLM wanted, it could easily escape. Use at your own risk. Again, this is merely a small hobbiest project/proof of concept.
 
-Here's some examples with DeepSeek v4 Flash on low thinking effort (sped up and cut):
+### DeepSeek v4 Flash on low thinking effort (sped up and cut) examples:
 
 | Video | Description |
 |-------|-------------|
@@ -19,7 +20,8 @@ Here's some examples with DeepSeek v4 Flash on low thinking effort (sped up and 
 | <video src="https://github.com/user-attachments/assets/66b72706-0102-4dae-b234-f475f764ab02" width="320" height="240" controls></video> | **Example 4** — Teleporting to me and barely suceeding in destroying a sign. |
 | <video src="https://github.com/user-attachments/assets/b46d8bef-f417-4917-ba6c-38cc80647cc7" width="320" height="240" controls></video> | **Debug Mode (REPL)** — Manually write Ruby scripts with the same tooling as the bot has. Here's a bad example that I can't be bothered to record again. |
 
-> The FakePlayer plugin has been slightly modified to support 26.2 as well as add some niceties like grabbing every block and entity coordinate within a radius. I don't know Java, so... thank you China :)
+> [!NOTE]
+> The FakePlayer plugin has been slightly modified to support 26.2 as well as add some niceties like grabbing every block and entity coordinate within a radius. I don't know Java, so... thank you China ;)
 
 ## Current Limitations
 
@@ -28,8 +30,6 @@ Here's some examples with DeepSeek v4 Flash on low thinking effort (sped up and 
 - [ ] The REPL sandbox is very weak, purely a "better than nothing".
 - [ ] LLM response can be slow, even on a flash model with low thinking. Perhaps a better system prompt would help.
 - [ ] No memory, each turn is fresh, although the LLM may pickup on context clues. Simple fix, but context may get bloated.
-
-> All in all, pretty neat! I think there's some potential. DeepSeek on higher effort thinking can get very intricate. I once asked it to spawn it's own fake players using the plugin and indepdendently control each one, randomly moving around and talking in chat. It successfully did so with 10 fake players concurrently.
 
 ## Credits & Acknowledgments
 
