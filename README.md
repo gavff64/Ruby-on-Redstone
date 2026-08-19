@@ -8,7 +8,7 @@ The concept of this project is that we make a semi-sandboxed REPL environment, g
 > <div align="center">
 > ⚠️ WARNING:
 >
-> **This is NOT a truly sandboxed REPL environment. If the LLM wanted, it could easily escape and cause unintended behavior. Use at your own risk. Again, this is merely a small hobbiest project/proof of concept.** </div>
+> **This is NOT a truly sandboxed REPL environment. If the LLM wanted, it could easily escape and cause unintended behavior. Use at your own risk. Again, this is merely a proof of concept.** </div>
 ---
 
 
